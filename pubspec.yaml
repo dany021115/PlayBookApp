@@ -1,0 +1,97 @@
+name: playbook
+description: "PlayBook — sports prediction tips client. Consumes PlayBookApi."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State management
+  flutter_bloc: ^9.1.1
+  bloc: ^9.0.0
+  bloc_concurrency: ^0.3.0
+  rxdart: ^0.28.0
+
+  # Navigation
+  go_router: ^16.0.0
+
+  # UI
+  responsive_framework: ^1.5.1
+  google_fonts: ^6.3.0
+  cached_network_image: ^3.4.1
+  toastification: ^3.0.3
+
+  # Network + API
+  dio: ^5.8.0+1
+  retrofit: 4.5.0
+  web_socket_channel: ^3.0.2
+
+  # Config
+  envied: ^1.1.1
+
+  # DI
+  get_it: ^9.0.5
+  injectable: ^2.5.0
+
+  # Storage
+  shared_preferences: ^2.5.3
+  flutter_secure_storage: ^9.2.2
+
+  # Auth (NO firebase_auth — Cuba)
+  google_sign_in: ^6.2.2
+
+  # Push (server uses HTTP v1; messaging package on client OK)
+  firebase_core: ^3.13.0
+  firebase_messaging: ^15.2.4
+
+  # Utilities
+  fpdart: ^1.1.1
+  timeago: ^3.7.1
+  package_info_plus: ^9.0.0
+
+  # Code-gen annotations
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Monitoring
+  sentry_flutter: ^9.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Code generation
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  retrofit_generator: ^9.2.0
+  injectable_generator: ^2.6.2
+  envied_generator: ^1.1.1
+
+  # Launcher icons
+  flutter_launcher_icons: ^0.14.4
+
+  # Test helpers
+  bloc_test: ^10.0.0
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - .env
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/launcher/icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#0F172A"
+  adaptive_icon_foreground: "assets/launcher/icon_foreground.png"
+  remove_alpha_ios: true
