@@ -18,11 +18,12 @@ class _RestClient implements RestClient {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<TokenResponse> tokenObtain(TokenObtainRequest body) async {
+  Future<TokenResponse> tokenObtain(Map<String, dynamic> body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = body;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<TokenResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
@@ -73,11 +74,12 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<UserDto> accountCreate(AccountCreateRequest body) async {
+  Future<UserDto> accountCreate(Map<String, dynamic> body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = body;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<UserDto>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(

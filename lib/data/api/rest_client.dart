@@ -12,14 +12,18 @@ abstract class RestClient {
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
   // ── Auth ──
+  // Bodies passed as Map<String, dynamic>: retrofit_generator can't find a
+  // `toJson()` on Freezed classes from static analysis, and silently emits
+  // `data: body` (the raw Dart object) which Dio fails to serialize as
+  // DioExceptionType.unknown. Repos call `req.toJson()` themselves.
   @POST(ApiConstants.tokenObtain)
-  Future<TokenResponse> tokenObtain(@Body() TokenObtainRequest body);
+  Future<TokenResponse> tokenObtain(@Body() Map<String, dynamic> body);
 
   @POST(ApiConstants.tokenRefresh)
   Future<TokenRefreshResponse> tokenRefresh(@Body() Map<String, dynamic> body);
 
   @POST(ApiConstants.accountCreate)
-  Future<UserDto> accountCreate(@Body() AccountCreateRequest body);
+  Future<UserDto> accountCreate(@Body() Map<String, dynamic> body);
 
   @GET(ApiConstants.accountMe)
   Future<UserDto> accountMe();

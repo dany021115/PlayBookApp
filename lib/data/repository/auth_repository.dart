@@ -55,9 +55,10 @@ class AuthRepository implements IAuthRepository {
   Future<Either<AppError, User>> loginWithGoogle({
     required String googleAccessToken,
     required String platform,
+    String googleEmail = 'google-user',
   }) =>
       _runTokenObtain(TokenObtainRequest(
-        username: '',
+        username: googleEmail,
         password: googleAccessToken,
         provider: 'google',
         platform: platform,
@@ -78,7 +79,7 @@ class AuthRepository implements IAuthRepository {
         password: password,
         firstName: firstName,
         lastName: lastName,
-      ));
+      ).toJson());
       return Right(dto.toEntity());
     } on DioException catch (e) {
       return Left(AppError.fromDio(e));
@@ -135,7 +136,7 @@ class AuthRepository implements IAuthRepository {
 
   Future<Either<AppError, User>> _runTokenObtain(TokenObtainRequest req) async {
     try {
-      final resp = await _api.tokenObtain(req);
+      final resp = await _api.tokenObtain(req.toJson());
       await _tokens.save(access: resp.access, refresh: resp.refresh);
       User? user;
       if (resp.user != null) {

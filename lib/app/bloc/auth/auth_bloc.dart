@@ -61,24 +61,42 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(const AuthState.loading());
     final repo = _repo as AuthRepository;
-    final account = await repo.beginGoogleFlow();
-    if (account == null) {
-      emit(const AuthState.unauthenticated());
-      return;
+    try {
+      debugPrint('[GoogleAuth] beginGoogleFlow…');
+      final account = await repo.beginGoogleFlow();
+      debugPrint('[GoogleAuth] account=${account?.email ?? '<null>'}');
+      if (account == null) {
+        emit(const AuthState.unauthenticated());
+        return;
+      }
+      final accessToken = await repo.obtainGoogleAccessToken(account);
+      debugPrint(
+          '[GoogleAuth] accessToken=${accessToken == null ? '<null>' : '${accessToken.substring(0, 10)}…(${accessToken.length})'}');
+      if (accessToken == null) {
+        emit(AuthState.error(
+            const AppError.unknown(message: 'No Google access token')));
+        return;
+      }
+      final result = await repo.loginWithGoogle(
+        googleAccessToken: accessToken,
+        googleEmail: account.email,
+        platform:
+            defaultTargetPlatform == TargetPlatform.iOS ? 'IOS' : 'ANDROID',
+      );
+      result.fold(
+        (e) {
+          debugPrint('[GoogleAuth] backend rejected: ${e.displayMessage}');
+          emit(AuthState.error(e));
+        },
+        (u) {
+          debugPrint('[GoogleAuth] OK user=${u.email}');
+          emit(AuthState.authenticated(u));
+        },
+      );
+    } catch (e, st) {
+      debugPrint('[GoogleAuth] EXCEPTION: $e\n$st');
+      emit(AuthState.error(AppError.unknown(message: 'Google: $e')));
     }
-    final accessToken = await repo.obtainGoogleAccessToken(account);
-    if (accessToken == null) {
-      emit(AuthState.error(const AppError.unknown(message: 'No Google access token')));
-      return;
-    }
-    final result = await repo.loginWithGoogle(
-      googleAccessToken: accessToken,
-      platform: defaultTargetPlatform == TargetPlatform.iOS ? 'IOS' : 'ANDROID',
-    );
-    result.fold(
-      (e) => emit(AuthState.error(e)),
-      (u) => emit(AuthState.authenticated(u)),
-    );
   }
 
   Future<void> _onRegistered(_Registered event, Emitter<AuthState> emit) async {

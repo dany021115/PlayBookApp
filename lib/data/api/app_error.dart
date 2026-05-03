@@ -23,7 +23,22 @@ class AppError with _$AppError {
     final response = exc.response;
     final status = response?.statusCode;
     final body = response?.data;
-    final detail = body is Map ? (body['detail']?.toString()) : null;
+    String? detail;
+    if (body is Map) {
+      detail = (body['detail'] ??
+              body['error'] ??
+              body['non_field_errors'] ??
+              body['message'])
+          ?.toString();
+    } else if (body is String && body.isNotEmpty) {
+      detail = body;
+    }
+
+    // Verbose console diagnostics — only fires on actual Dio errors.
+    // Helps surface 401/403 messages the backend sends without `detail`.
+    // ignore: avoid_print
+    print('[AppError.fromDio] type=${exc.type} status=$status body=$body '
+        'msg=${exc.message}');
 
     if (exc.type == DioExceptionType.connectionTimeout ||
         exc.type == DioExceptionType.receiveTimeout ||

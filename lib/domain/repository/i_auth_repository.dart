@@ -19,9 +19,12 @@ abstract class IAuthRepository {
 
   /// Google sign-in: caller obtains a Google access token via `google_sign_in`,
   /// hands it to the backend which validates and issues our own JWTs.
+  /// `googleEmail` is sent as the JWT serializer's `username` field (it requires
+  /// a non-blank value before our custom validate() can bypass it for Google).
   Future<Either<AppError, User>> loginWithGoogle({
     required String googleAccessToken,
     required String platform,
+    String googleEmail,
   });
 
   /// Register a new account. Auto-login NOT performed — caller decides.
