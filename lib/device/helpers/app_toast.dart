@@ -1,40 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:playbook/app/shared/widgets/playbook_toast.dart';
 import 'package:toastification/toastification.dart';
 
+/// Thin facade over `toastification` that always renders [PlaybookToast]
+/// (the Pencil `Toast/*` cards in `U9QHd / Feedback`).
+///
+/// Calling code stays identical (`AppToast.success(context, '...')`) and an
+/// optional [subtitle] enables the 2-line variant.
 abstract class AppToast {
-  static void error(BuildContext context, String message) {
-    _show(context, message, ToastificationType.error);
-  }
+  static void error(BuildContext context, String title, {String? subtitle}) =>
+      _show(context, PlaybookToastVariant.error, title, subtitle);
 
-  static void success(BuildContext context, String message) {
-    _show(context, message, ToastificationType.success);
-  }
+  static void success(BuildContext context, String title,
+          {String? subtitle}) =>
+      _show(context, PlaybookToastVariant.success, title, subtitle);
 
-  static void warning(BuildContext context, String message) {
-    _show(context, message, ToastificationType.warning);
-  }
+  static void warning(BuildContext context, String title,
+          {String? subtitle}) =>
+      _show(context, PlaybookToastVariant.warning, title, subtitle);
 
-  static void info(BuildContext context, String message) {
-    _show(context, message, ToastificationType.info);
-  }
+  static void info(BuildContext context, String title, {String? subtitle}) =>
+      _show(context, PlaybookToastVariant.info, title, subtitle);
 
   static void _show(
     BuildContext context,
-    String message,
-    ToastificationType type,
+    PlaybookToastVariant variant,
+    String title,
+    String? subtitle,
   ) {
-    toastification.show(
+    toastification.showCustom(
       context: context,
-      type: type,
-      style: ToastificationStyle.fillColored,
-      title: Semantics(
-        liveRegion: true,
-        child: Text(message),
-      ),
       autoCloseDuration: const Duration(seconds: 3),
       alignment: Alignment.topRight,
-      showProgressBar: false,
-      dragToClose: true,
+      builder: (context, holder) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: PlaybookToast(
+          variant: variant,
+          title: title,
+          subtitle: subtitle,
+          onClose: () => toastification.dismiss(holder),
+        ),
+      ),
     );
   }
 }

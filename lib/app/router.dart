@@ -11,6 +11,7 @@ import 'package:playbook/app/presentation/home/follows_page.dart';
 import 'package:playbook/app/presentation/home/matches_page.dart';
 import 'package:playbook/app/presentation/home/predictions_page.dart';
 import 'package:playbook/app/presentation/home/profile_page.dart';
+import 'package:playbook/app/presentation/match_detail/match_detail_page.dart';
 import 'package:playbook/app/presentation/splash/splash_page.dart';
 import 'package:playbook/app/shared/widgets/main_shell.dart';
 import 'package:playbook/device/router/manager.dart';
@@ -146,6 +147,19 @@ class RouterController {
                 key: state.pageKey,
                 child: const MatchesPage(),
               ),
+              routes: [
+                GoRoute(
+                  path: ':id',
+                  name: AppRoute.matchDetail.name,
+                  pageBuilder: (context, state) =>
+                      PageTransitions.platformTransition(
+                    child: MatchDetailPage(
+                      matchId: state.pathParameters['id'],
+                    ),
+                    state: state,
+                  ),
+                ),
+              ],
             ),
             GoRoute(
               path: '${RouterManager.baseHome}/predictions',

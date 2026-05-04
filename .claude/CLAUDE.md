@@ -90,7 +90,13 @@ Flutter responsibilities:
 
 ## iOS HIG compliance (mandatory)
 
-Same as TeeShot. See `.claude/rules/architecture.md` and `.claude/rules/widget-standards.md` — shared with this project intentionally.
+Same as TeeShot. See `.claude/rules/architecture.md`, `.claude/rules/widget-standards.md` and `.claude/rules/widget-extraction.md` — shared with this project intentionally.
+
+**Widget extraction is mandatory.** User explicitly hates long files: page files target ≤200 lines (hard ceiling 300), widget files ≤150 (hard ceiling 200). Always split visual sub-trees into separate widget files under `widgets/<feature>/`. See `.claude/rules/widget-extraction.md` for the full discipline + folder layout.
+
+**Mock data lives in `lib/app/mock/`**, never inline in widgets. One file per feature (`matches_mock.dart`, `predictions_mock.dart`, ...) exposing `@immutable` model classes + a `FooMock` namespace with `static const` lists. Widgets read `FooMock.items` and the swap to real BLoC state is a one-line change. See `.claude/rules/mock-data.md`.
+
+**Responsive layout follows the dlujo pattern.** Page resolves `isMobile` ONCE at the top of `build` and passes it down via constructor params. Leaf widgets receive `final bool isMobile;` — they never call `ResponsiveBreakpoints.of(context)` themselves. Sizes are inline ternaries (`fontSize: isMobile ? 48 : 88`) — no intermediate variables. Layout shifts (column → row of expanded) reuse the SAME widget instances and only swap the container. See `.claude/rules/responsive.md`.
 
 Highlights:
 - Mandatory `SafeArea` on every page.

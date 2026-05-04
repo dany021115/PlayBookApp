@@ -31,6 +31,14 @@
 
   <title>playbook</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Google Sign-In (web). The Client ID below is the Web OAuth client
+       from Google Cloud Console, used by `google_sign_in` to issue an
+       id_token / access_token to the backend. Android picks its own
+       client via the registered package + SHA-1 (no meta tag needed). -->
+  <meta name="google-signin-client_id"
+        content="26573542509-qc4np7l614shh0r7ad890u4tcemej027.apps.googleusercontent.com">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

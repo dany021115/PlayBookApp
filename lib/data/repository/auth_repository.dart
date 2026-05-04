@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:fpdart/fpdart.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
@@ -12,6 +13,12 @@ import '../api/rest_client.dart';
 import '../entities/auth_responses.dart';
 import '../service/auth_token_storage.dart';
 
+/// Web OAuth client ID — Google Cloud Console "Web application" credential.
+/// Already public in `web/index.html` meta tag, so safe to hardcode here so
+/// the `google_sign_in_web` plugin can pick it up via the constructor too.
+const String _kWebGoogleClientId =
+    '26573542509-qc4np7l614shh0r7ad890u4tcemej027.apps.googleusercontent.com';
+
 @LazySingleton(as: IAuthRepository)
 class AuthRepository implements IAuthRepository {
   final RestClient _api;
@@ -21,7 +28,10 @@ class AuthRepository implements IAuthRepository {
   User? _currentUser;
 
   AuthRepository(this._api, this._tokens)
-      : _google = GoogleSignIn(scopes: const ['email', 'profile', 'openid']);
+      : _google = GoogleSignIn(
+          clientId: kIsWeb ? _kWebGoogleClientId : null,
+          scopes: const ['email', 'profile', 'openid'],
+        );
 
   @override
   bool get isAuthenticated => _tokens.hasSession;

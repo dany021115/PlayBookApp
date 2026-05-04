@@ -1,29 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:playbook/app/shared/widgets/app_sidebar_nav.dart';
 import 'package:playbook/device/theme/color.dart';
 import 'package:playbook/device/theme/spacing.dart';
 import 'package:playbook/device/theme/typography.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
-/// App shell with the floating pill nav from Pencil `qOUhL` (Bottom Nav).
+/// One nav entry shared between the mobile pill nav and the desktop sidebar.
+/// Made public so [AppSidebarNav] in the shared folder can consume the same
+/// list without duplicating the model.
+class NavTab {
+  final IconData icon;
+  final String label;
+  final String path;
+  const NavTab({
+    required this.icon,
+    required this.label,
+    required this.path,
+  });
+}
+
+/// App shell.
 ///
-/// Container: 62 high, surface bg, 36 radius, 1px border, padding 4.
-/// Each tab is a pill (radius 26) with vertical icon + 10/600 caps label,
-/// gap 4. Active tab fills primary, inactive uses muted icon/label.
+/// Mobile / tablet — Pencil `qOUhL`: floating pill nav at the bottom.
+/// Desktop — Pencil `utJHR`: fixed left sidebar 240 wide, body fills the
+/// remainder.
 class MainShell extends StatelessWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
 
-  static const _tabs = <_Tab>[
-    _Tab(icon: Icons.home_outlined, label: 'INICIO', path: '/home/matches'),
-    _Tab(
+  static const _tabs = <NavTab>[
+    NavTab(icon: Icons.home_outlined, label: 'Inicio', path: '/home/matches'),
+    NavTab(
         icon: Icons.lightbulb_outline,
-        label: 'TIPS',
+        label: 'Picks',
         path: '/home/predictions'),
-    _Tab(
+    NavTab(
         icon: Icons.bookmark_border,
-        label: 'GUARDADOS',
+        label: 'Guardados',
         path: '/home/follows'),
-    _Tab(icon: Icons.person_outline, label: 'PERFIL', path: '/home/profile'),
+    NavTab(icon: Icons.person_outline, label: 'Perfil', path: '/home/profile'),
   ];
 
   int _currentIndex(BuildContext context) {
@@ -37,7 +53,27 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final index = _currentIndex(context);
+    final isDesktop = ResponsiveBreakpoints.of(context).isDesktop ||
+        ResponsiveBreakpoints.of(context).largerThan(DESKTOP);
+    final currentIndex = _currentIndex(context);
+
+    if (isDesktop) {
+      return Scaffold(
+        body: Row(
+          children: [
+            AppSidebarNav(
+              tabs: _tabs,
+              currentIndex: currentIndex,
+              onTap: (i) => _onTap(context, i),
+            ),
+            Expanded(child: child),
+          ],
+        ),
+      );
+    }
+
+    // Mobile + tablet (anything below desktop breakpoint) → floating pill
+    // nav at the bottom, matching the mobile/tablet pencil specs.
     return Scaffold(
       extendBody: true,
       body: child,
@@ -47,7 +83,7 @@ class MainShell extends StatelessWidget {
             AppSpacing.s16, 0, AppSpacing.s16, AppSpacing.s12),
         child: _PillNavBar(
           tabs: _tabs,
-          currentIndex: index,
+          currentIndex: currentIndex,
           onTap: (i) => _onTap(context, i),
         ),
       ),
@@ -56,7 +92,7 @@ class MainShell extends StatelessWidget {
 }
 
 class _PillNavBar extends StatelessWidget {
-  final List<_Tab> tabs;
+  final List<NavTab> tabs;
   final int currentIndex;
   final ValueChanged<int> onTap;
 
@@ -73,7 +109,7 @@ class _PillNavBar extends StatelessWidget {
       height: 62,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: colors.surface,
+        color: colors.surfaceContainer,
         borderRadius: BorderRadius.circular(36),
         border: Border.all(color: colors.outline, width: 1),
       ),
@@ -94,7 +130,7 @@ class _PillNavBar extends StatelessWidget {
 }
 
 class _PillTab extends StatelessWidget {
-  final _Tab tab;
+  final NavTab tab;
   final bool active;
   final VoidCallback onTap;
 
@@ -128,7 +164,7 @@ class _PillTab extends StatelessWidget {
               Icon(tab.icon, size: 18, color: fg),
               const SizedBox(height: 4),
               Text(
-                tab.label,
+                tab.label.toUpperCase(),
                 style: styles.caption?.copyWith(
                   color: fg,
                   fontSize: 10,
@@ -143,11 +179,4 @@ class _PillTab extends StatelessWidget {
       ),
     );
   }
-}
-
-class _Tab {
-  final IconData icon;
-  final String label;
-  final String path;
-  const _Tab({required this.icon, required this.label, required this.path});
 }
